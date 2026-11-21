@@ -1,50 +1,37 @@
 (cl:defpackage #:mine/term/color
   (:use #:coalton #:coalton-prelude)
+  (:local-nicknames (#:cell #:coalton/cell))
   (:export
-   #:Color
-   #:ColorDefault #:Color16 #:Color256 #:ColorRGB
-   #:Attr
-   #:AttrNone #:AttrBold #:AttrDim #:AttrItalic
-   #:AttrUnderline #:AttrReverse
-   #:Style #:Style
-   #:default-style
-   #:with-fg #:with-bg #:with-attr
-   ;; Basic
+   #:Color #:ColorDefault #:Color16 #:Color256 #:ColorRGB
+   #:Attr #:AttrNone #:AttrBold #:AttrDim #:AttrItalic #:AttrUnderline #:AttrReverse
+   #:Style #:Style #:with-fg #:with-bg #:with-attr
+   #:Theme #:Theme #:default-theme #:current-theme #:install-theme!
+   #:default-style #:background-color
+   ;; Fixed bootstrap colors.
    #:black #:white
-   ;; Tango palette - greys
    #:aluminium-1 #:aluminium-3 #:aluminium-4 #:aluminium-5 #:aluminium-6
-   #:charcoal #:jet #:slate #:dim-grey
-   ;; Non-Tango greys
-   #:silver #:onyx #:light-grey
-   ;; Tango palette - blues
+   #:charcoal #:jet #:slate #:dim-grey #:silver #:onyx #:light-grey
    #:sky-blue #:dark-blue #:baby-blue
-   ;; Tango palette - reds
-   #:scarlet-red #:dark-red #:tomato
-   ;; Non-Tango reds
-   #:coral
-   ;; Tango palette - yellows
-   #:butter #:dark-butter
-   ;; Tango palette - other
-   #:orange #:plum #:chameleon
-   ;; Non-Tango
+   #:scarlet-red #:dark-red #:tomato #:coral
+   #:butter #:dark-butter #:orange #:plum #:chameleon
    #:dark-slate-blue #:brown #:gold
-   ;; Semantic - backgrounds
-   #:selection-bg #:user-selection-style #:search-match-bg #:search-current-bg #:highlight-bg #:match-paren-bg
-   #:panel-bg #:repl-bg #:current-line-bg #:field-bg
-   #:status-bar-bg #:accent-bg #:error-dialog-bg
-   ;; Semantic - foregrounds
+   ;; Active theme colors.
+   #:selection-bg #:user-selection-style #:search-match-bg #:search-current-bg
+   #:highlight-bg #:match-paren-bg #:panel-bg #:repl-bg #:current-line-bg
+   #:field-bg #:status-bar-bg #:accent-bg #:error-dialog-bg
    #:text-fg #:text-dim-fg #:text-dimmer-fg
-   #:accent-fg #:error-fg #:warning-fg #:info-fg
-   #:gutter-fg #:border-fg
-   ;; Semantic - scrollbar
-   #:scrollbar-track-fg #:scrollbar-track-bg #:scrollbar-thumb-fg))
+   #:accent-fg #:error-fg #:warning-fg #:style-warning-fg #:info-fg
+   #:diagnostic-error-bg #:diagnostic-warning-bg
+   #:diagnostic-style-warning-bg #:diagnostic-info-bg #:quick-result-bg
+   #:gutter-fg #:border-fg #:brand-fg
+   #:scrollbar-track-fg #:scrollbar-track-bg #:scrollbar-thumb-fg
+   #:syntax-string-fg #:syntax-number-fg #:syntax-quote-fg
+   #:syntax-type-variable-fg #:syntax-constructor-fg #:syntax-accessor-fg
+   #:syntax-dynamic-fg))
 
 (in-package #:mine/term/color)
 
 (coalton-toplevel
-
-  ;;; Color
-
   (derive Eq)
   (define-type Color
     "Terminal color specification."
@@ -53,20 +40,11 @@
     (Color256 UFix)
     (ColorRGB UFix UFix UFix))
 
-  ;;; Attr
-
   (repr :enum)
   (derive Eq)
   (define-type Attr
     "Text attribute for terminal rendering."
-    AttrNone
-    AttrBold
-    AttrDim
-    AttrItalic
-    AttrUnderline
-    AttrReverse)
-
-  ;;; Style
+    AttrNone AttrBold AttrDim AttrItalic AttrUnderline AttrReverse)
 
   (derive Eq)
   (define-struct Style
@@ -75,119 +53,159 @@
     (style-bg Color)
     (style-attr Attr))
 
-  ;;; Defaults and helpers
-
-  (declare default-style Style)
-  (define default-style
-    "Style with default foreground and black background."
-    (Style (ColorRGB 255 255 255) (ColorRGB 0 0 0) AttrNone))
-
   (declare with-fg (Style * Color -> Style))
-  (define (with-fg s c)
-    "Return a new style with the foreground color replaced."
-    (Style c (.style-bg s) (.style-attr s)))
+  (define (with-fg s c) (Style c (.style-bg s) (.style-attr s)))
 
   (declare with-bg (Style * Color -> Style))
-  (define (with-bg s c)
-    "Return a new style with the background color replaced."
-    (Style (.style-fg s) c (.style-attr s)))
+  (define (with-bg s c) (Style (.style-fg s) c (.style-attr s)))
 
   (declare with-attr (Style * Attr -> Style))
-  (define (with-attr s a)
-    "Return a new style with the attribute replaced."
-    (Style (.style-fg s) (.style-bg s) a)))
+  (define (with-attr s a) (Style (.style-fg s) (.style-bg s) a)))
 
-;;; Named colors
+;;; Fixed colors used by the compiled default theme and setup UI.
 
 (coalton-toplevel
-
-  ;; Basic
-
-  (define black (ColorRGB   0   0   0))
+  (define black (ColorRGB 0 0 0))
   (define white (ColorRGB 255 255 255))
-
-  ;; Tango palette - greys / aluminium
-
   (define aluminium-1 (ColorRGB 238 238 236))
   (define aluminium-3 (ColorRGB 186 189 182))
   (define aluminium-4 (ColorRGB 136 138 133))
-  (define aluminium-5 (ColorRGB  85  87  83))
-  (define aluminium-6 (ColorRGB  46  52  52))
-  (define charcoal    (ColorRGB  37  43  43))
-  (define jet         (ColorRGB  32  36  36))
-  (define slate       (ColorRGB  54  60  60))
-  (define dim-grey    (ColorRGB  60  66  66))
-
-  ;; Non-Tango greys
-
-  (define silver     (ColorRGB 187 187 188))
-  (define onyx       (ColorRGB  34  34  34))
+  (define aluminium-5 (ColorRGB 85 87 83))
+  (define aluminium-6 (ColorRGB 46 52 52))
+  (define charcoal (ColorRGB 37 43 43))
+  (define jet (ColorRGB 32 36 36))
+  (define slate (ColorRGB 54 60 60))
+  (define dim-grey (ColorRGB 60 66 66))
+  (define silver (ColorRGB 187 187 188))
+  (define onyx (ColorRGB 34 34 34))
   (define light-grey (ColorRGB 200 200 200))
-
-  ;; Blues
-
-  (define sky-blue  (ColorRGB 114 159 207))
-  (define dark-blue (ColorRGB  52 101 164))
+  (define sky-blue (ColorRGB 114 159 207))
+  (define dark-blue (ColorRGB 52 101 164))
   (define baby-blue (ColorRGB 135 206 250))
+  (define scarlet-red (ColorRGB 239 41 41))
+  (define dark-red (ColorRGB 140 0 0))
+  (define tomato (ColorRGB 255 99 71))
+  (define coral (ColorRGB 200 60 60))
+  (define butter (ColorRGB 252 233 79))
+  (define dark-butter (ColorRGB 237 212 0))
+  (define orange (ColorRGB 252 175 62))
+  (define plum (ColorRGB 173 127 168))
+  (define chameleon (ColorRGB 138 226 52))
+  (define dark-slate-blue (ColorRGB 72 61 139))
+  (define brown (ColorRGB 161 105 18))
+  (define gold (ColorRGB 214 138 22)))
 
-  ;; Reds
+;;; Resolved runtime theme. Accessor functions deliberately preserve the old
+;;; semantic names while allowing the active theme to change atomically.
 
-  (define scarlet-red (ColorRGB 239  41  41))
-  (define dark-red    (ColorRGB 140   0   0))
-  (define tomato      (ColorRGB 255  99  71))
-  (define coral       (ColorRGB 200  60  60))
+(coalton-toplevel
+  (define-struct Theme
+    "A resolved Mine color theme."
+    (theme-name String)
+    (theme-default-style Style)
+    (theme-selection-bg Color)
+    (theme-search-match-bg Color)
+    (theme-search-current-bg Color)
+    (theme-highlight-bg Color)
+    (theme-match-paren-bg Color)
+    (theme-panel-bg Color)
+    (theme-repl-bg Color)
+    (theme-current-line-bg Color)
+    (theme-field-bg Color)
+    (theme-status-bar-bg Color)
+    (theme-accent-bg Color)
+    (theme-error-dialog-bg Color)
+    (theme-text-fg Color)
+    (theme-text-dim-fg Color)
+    (theme-text-dimmer-fg Color)
+    (theme-accent-fg Color)
+    (theme-error-fg Color)
+    (theme-warning-fg Color)
+    (theme-style-warning-fg Color)
+    (theme-info-fg Color)
+    (theme-diagnostic-error-bg Color)
+    (theme-diagnostic-warning-bg Color)
+    (theme-diagnostic-style-warning-bg Color)
+    (theme-diagnostic-info-bg Color)
+    (theme-quick-result-bg Color)
+    (theme-gutter-fg Color)
+    (theme-border-fg Color)
+    (theme-brand-fg Color)
+    (theme-scrollbar-track-fg Color)
+    (theme-scrollbar-track-bg Color)
+    (theme-scrollbar-thumb-fg Color)
+    (theme-syntax-string-fg Color)
+    (theme-syntax-number-fg Color)
+    (theme-syntax-quote-fg Color)
+    (theme-syntax-type-variable-fg Color)
+    (theme-syntax-constructor-fg Color)
+    (theme-syntax-accessor-fg Color)
+    (theme-syntax-dynamic-fg Color))
 
-  ;; Yellows
+  (declare default-theme-value Theme)
+  (define default-theme-value
+    (Theme "default" (Style white black AttrNone)
+           dark-slate-blue brown gold sky-blue dark-blue
+           aluminium-6 charcoal charcoal jet aluminium-5 dark-blue dark-red
+           aluminium-1 aluminium-3 aluminium-4 sky-blue scarlet-red orange gold butter
+           dark-red brown slate dark-blue slate
+           aluminium-5 aluminium-5 baby-blue
+           dim-grey aluminium-6 aluminium-3
+           plum chameleon scarlet-red chameleon dark-butter plum tomato))
 
-  (define butter      (ColorRGB 252 233  79))
-  (define dark-butter (ColorRGB 237 212   0))
+  (declare active-theme (cell:Cell Theme))
+  (define active-theme (cell:new default-theme-value))
 
-  ;; Other
+  (declare default-theme (Void -> Theme))
+  (define (default-theme) default-theme-value)
 
-  (define orange    (ColorRGB 252 175  62))
-  (define plum      (ColorRGB 173 127 168))
-  (define chameleon (ColorRGB 138 226  52))
+  (declare current-theme (Void -> Theme))
+  (define (current-theme) (cell:read active-theme))
 
-  ;; Non-Tango
+  (declare install-theme! (Theme -> Void))
+  (define (install-theme! theme) (cell:write! active-theme theme) (values))
 
-  (define dark-slate-blue (ColorRGB  72  61 139))
-  (define brown           (ColorRGB 161 105  18))
-  (define gold            (ColorRGB 214 138  22))
+  (define (default-style) (.theme-default-style (current-theme)))
+  (define (background-color) (.style-bg (default-style)))
+  (define (selection-bg) (.theme-selection-bg (current-theme)))
+  (define (search-match-bg) (.theme-search-match-bg (current-theme)))
+  (define (search-current-bg) (.theme-search-current-bg (current-theme)))
+  (define (highlight-bg) (.theme-highlight-bg (current-theme)))
+  (define (match-paren-bg) (.theme-match-paren-bg (current-theme)))
+  (define (panel-bg) (.theme-panel-bg (current-theme)))
+  (define (repl-bg) (.theme-repl-bg (current-theme)))
+  (define (current-line-bg) (.theme-current-line-bg (current-theme)))
+  (define (field-bg) (.theme-field-bg (current-theme)))
+  (define (status-bar-bg) (.theme-status-bar-bg (current-theme)))
+  (define (accent-bg) (.theme-accent-bg (current-theme)))
+  (define (error-dialog-bg) (.theme-error-dialog-bg (current-theme)))
+  (define (text-fg) (.theme-text-fg (current-theme)))
+  (define (text-dim-fg) (.theme-text-dim-fg (current-theme)))
+  (define (text-dimmer-fg) (.theme-text-dimmer-fg (current-theme)))
+  (define (accent-fg) (.theme-accent-fg (current-theme)))
+  (define (error-fg) (.theme-error-fg (current-theme)))
+  (define (warning-fg) (.theme-warning-fg (current-theme)))
+  (define (style-warning-fg) (.theme-style-warning-fg (current-theme)))
+  (define (info-fg) (.theme-info-fg (current-theme)))
+  (define (diagnostic-error-bg) (.theme-diagnostic-error-bg (current-theme)))
+  (define (diagnostic-warning-bg) (.theme-diagnostic-warning-bg (current-theme)))
+  (define (diagnostic-style-warning-bg) (.theme-diagnostic-style-warning-bg (current-theme)))
+  (define (diagnostic-info-bg) (.theme-diagnostic-info-bg (current-theme)))
+  (define (quick-result-bg) (.theme-quick-result-bg (current-theme)))
+  (define (gutter-fg) (.theme-gutter-fg (current-theme)))
+  (define (border-fg) (.theme-border-fg (current-theme)))
+  (define (brand-fg) (.theme-brand-fg (current-theme)))
+  (define (scrollbar-track-fg) (.theme-scrollbar-track-fg (current-theme)))
+  (define (scrollbar-track-bg) (.theme-scrollbar-track-bg (current-theme)))
+  (define (scrollbar-thumb-fg) (.theme-scrollbar-thumb-fg (current-theme)))
+  (define (syntax-string-fg) (.theme-syntax-string-fg (current-theme)))
+  (define (syntax-number-fg) (.theme-syntax-number-fg (current-theme)))
+  (define (syntax-quote-fg) (.theme-syntax-quote-fg (current-theme)))
+  (define (syntax-type-variable-fg) (.theme-syntax-type-variable-fg (current-theme)))
+  (define (syntax-constructor-fg) (.theme-syntax-constructor-fg (current-theme)))
+  (define (syntax-accessor-fg) (.theme-syntax-accessor-fg (current-theme)))
+  (define (syntax-dynamic-fg) (.theme-syntax-dynamic-fg (current-theme)))
 
-  ;;; Semantic names - backgrounds
-
-  (define selection-bg      dark-slate-blue)
-  (define search-match-bg   brown)
-  (define search-current-bg gold)
-  (define highlight-bg      sky-blue)
-  (define match-paren-bg   (ColorRGB 52 101 164))
-  (define panel-bg          aluminium-6)
-  (define repl-bg           charcoal)
-  (define current-line-bg   charcoal)
-  (define field-bg          jet)
-  (define status-bar-bg     aluminium-5)
-  (define accent-bg         dark-blue)
-  (define error-dialog-bg   dark-red)
-
-  ;;; Semantic names - styles
-
-  (define user-selection-style
-    (Style panel-bg highlight-bg AttrNone))
-
-  ;;; Semantic names - foregrounds
-
-  (define text-fg        aluminium-1)
-  (define text-dim-fg    aluminium-3)
-  (define text-dimmer-fg aluminium-4)
-  (define accent-fg      sky-blue)
-  (define error-fg       scarlet-red)
-  (define warning-fg     orange)
-  (define info-fg        butter)
-  (define gutter-fg      aluminium-5)
-  (define border-fg      aluminium-5)
-
-  ;;; Semantic names - scrollbar
-
-  (define scrollbar-track-fg dim-grey)
-  (define scrollbar-track-bg aluminium-6)
-  (define scrollbar-thumb-fg aluminium-3))
+  (declare user-selection-style (Void -> Style))
+  (define (user-selection-style)
+    (Style (panel-bg) (highlight-bg) AttrNone)))

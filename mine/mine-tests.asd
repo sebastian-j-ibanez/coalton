@@ -14,6 +14,7 @@
                (:file "diagnostic-store-tests")
                (:file "diagnostic-adapter-tests")
                (:file "fixtures")
+               (:file "theme-tests")
                (:file "project-tests")
                (:file "syntax-tests")
                (:file "indent-tests")

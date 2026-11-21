@@ -62,21 +62,21 @@ Handles terminal resize by calling REDRAW-FN."
     (let scr = (.terminal-screen term))
     (let cols = (term:terminal-cols term))
     (let rows = (term:terminal-rows term))
-    (let bg = (color:Style color:text-fg
-                           color:panel-bg
+    (let bg = (color:Style (color:text-fg)
+                           (color:panel-bg)
                            color:AttrNone))
-    (let brand = (color:Style color:baby-blue
-                              color:panel-bg
+    (let brand = (color:Style (color:brand-fg)
+                              (color:panel-bg)
                               color:AttrBold))
-    (let dim = (color:Style color:text-dimmer-fg
-                            color:panel-bg
+    (let dim = (color:Style (color:text-dimmer-fg)
+                            (color:panel-bg)
                             color:AttrItalic))
     (let box-w = 36)
     (let box-h = 12)
     (let bx = (lisp (-> UFix) (cols box-w) (cl:max 0 (cl:floor (cl:- cols box-w) 2))))
     (let by = (lisp (-> UFix) (rows box-h) (cl:max 0 (cl:floor (cl:- rows box-h) 2))))
-    (let border-style = (color:Style color:border-fg
-                                     color:panel-bg
+    (let border-style = (color:Style (color:border-fg)
+                                     (color:panel-bg)
                                      color:AttrNone))
     (screen:screen-clear scr)
     (render:draw-box scr (wt:Rect bx by box-w box-h) border-style)
@@ -167,23 +167,23 @@ Handles terminal resize by calling REDRAW-FN."
     (let scr = (.terminal-screen term))
     (let cols = (term:terminal-cols term))
     (let rows = (term:terminal-rows term))
-    (let bg = (color:Style color:text-fg
-                           color:panel-bg
+    (let bg = (color:Style (color:text-fg)
+                           (color:panel-bg)
                            color:AttrNone))
-    (let title-s = (color:Style color:accent-fg
-                                color:panel-bg
+    (let title-s = (color:Style (color:accent-fg)
+                                (color:panel-bg)
                                 color:AttrBold))
-    (let dim = (color:Style color:text-dimmer-fg
-                            color:panel-bg
+    (let dim = (color:Style (color:text-dimmer-fg)
+                            (color:panel-bg)
                             color:AttrItalic))
-    (let border-style = (color:Style color:border-fg
-                                     color:panel-bg
+    (let border-style = (color:Style (color:border-fg)
+                                     (color:panel-bg)
                                      color:AttrNone))
-    (let track-s = (color:Style color:scrollbar-track-fg
-                                color:scrollbar-track-bg
+    (let track-s = (color:Style (color:scrollbar-track-fg)
+                                (color:scrollbar-track-bg)
                                 color:AttrNone))
-    (let thumb-s = (color:Style color:scrollbar-thumb-fg
-                                color:scrollbar-track-bg
+    (let thumb-s = (color:Style (color:scrollbar-thumb-fg)
+                                (color:scrollbar-track-bg)
                                 color:AttrNone))
     (let lines = (%credits-lines))
     (let n = (length lines))
@@ -318,20 +318,20 @@ scroll; any other key closes."
     (let scr = (.terminal-screen term))
     (let cols = (term:terminal-cols term))
     (let rows = (term:terminal-rows term))
-    (let bg = (color:Style color:text-fg
-                           color:panel-bg
+    (let bg = (color:Style (color:text-fg)
+                           (color:panel-bg)
                            color:AttrNone))
-    (let title-s = (color:Style color:error-fg
-                                color:panel-bg
+    (let title-s = (color:Style (color:error-fg)
+                                (color:panel-bg)
                                 color:AttrBold))
-    (let border-s = (color:Style color:error-fg
-                                 color:panel-bg
+    (let border-s = (color:Style (color:error-fg)
+                                 (color:panel-bg)
                                  color:AttrNone))
-    (let btn-sel = (color:Style color:panel-bg
-                                color:text-fg
+    (let btn-sel = (color:Style (color:panel-bg)
+                                (color:text-fg)
                                 color:AttrBold))
-    (let help-s = (color:Style color:text-dim-fg
-                               color:panel-bg
+    (let help-s = (color:Style (color:text-dim-fg)
+                               (color:panel-bg)
                                color:AttrNone))
     (let title-len = (the UFix (lisp (-> UFix) (title) (cl:length title))))
     (let msg-len = (the UFix (lisp (-> UFix) (message) (cl:length message))))
@@ -381,17 +381,17 @@ scroll; any other key closes."
     (let scr = (.terminal-screen term))
     (let cols = (term:terminal-cols term))
     (let rows = (term:terminal-rows term))
-    (let bg = (color:Style color:text-fg
-                           color:panel-bg
+    (let bg = (color:Style (color:text-fg)
+                           (color:panel-bg)
                            color:AttrNone))
-    (let border-s = (color:Style color:border-fg
-                                 color:panel-bg
+    (let border-s = (color:Style (color:border-fg)
+                                 (color:panel-bg)
                                  color:AttrNone))
-    (let btn-s = (color:Style color:panel-bg
-                              color:text-dimmer-fg
+    (let btn-s = (color:Style (color:panel-bg)
+                              (color:text-dimmer-fg)
                               color:AttrBold))
-    (let btn-sel = (color:Style color:panel-bg
-                                color:text-fg
+    (let btn-sel = (color:Style (color:panel-bg)
+                                (color:text-fg)
                                 color:AttrBold))
     (let msg-len = (the UFix (lisp (-> UFix) (message) (cl:length message))))
     (let yes-len = (the UFix (lisp (-> UFix) (btn-yes) (cl:length btn-yes))))
@@ -437,7 +437,7 @@ scroll; any other key closes."
     (screen:screen-set-string scr (+ by 2) msg-x message bg)
     ;; Help text (if any)
     (%render-help-lines scr help-lines bx box-w (+ by 4)
-                        (color:Style color:text-dim-fg color:panel-bg color:AttrItalic))
+                        (color:Style (color:text-dim-fg) (color:panel-bg) color:AttrItalic))
     ;; Buttons: [ Yes ] [ No ] with selection highlight
     (let yes-style = (if (== selected 0) btn-sel btn-s))
     (let no-style = (if (== selected 1) btn-sel btn-s))
@@ -534,20 +534,20 @@ scroll; any other key closes."
     (let scr = (.terminal-screen term))
     (let cols = (term:terminal-cols term))
     (let rows = (term:terminal-rows term))
-    (let bg = (color:Style color:text-fg
-                           color:panel-bg color:AttrNone))
-    (let border-s = (color:Style color:border-fg
-                                 color:panel-bg color:AttrNone))
-    (let label-s = (color:Style color:text-dim-fg
-                                color:panel-bg color:AttrNone))
-    (let field-s = (color:Style color:text-fg
-                                color:field-bg color:AttrNone))
-    (let active-s = (color:Style color:info-fg
-                                 color:field-bg color:AttrBold))
-    (let btn-s = (color:Style color:text-dim-fg
-                              color:panel-bg color:AttrNone))
-    (let btn-sel = (color:Style color:text-fg
-                                color:accent-fg color:AttrBold))
+    (let bg = (color:Style (color:text-fg)
+                           (color:panel-bg) color:AttrNone))
+    (let border-s = (color:Style (color:border-fg)
+                                 (color:panel-bg) color:AttrNone))
+    (let label-s = (color:Style (color:text-dim-fg)
+                                (color:panel-bg) color:AttrNone))
+    (let field-s = (color:Style (color:text-fg)
+                                (color:field-bg) color:AttrNone))
+    (let active-s = (color:Style (color:info-fg)
+                                 (color:field-bg) color:AttrBold))
+    (let btn-s = (color:Style (color:text-dim-fg)
+                              (color:panel-bg) color:AttrNone))
+    (let btn-sel = (color:Style (color:text-fg)
+                                (color:accent-fg) color:AttrBold))
     (let box-w = (min 60 (- cols 4)))
     (let box-h = 9)
     (let bx = (lisp (-> UFix) (cols box-w) (cl:max 0 (cl:floor (cl:- cols box-w) 2))))
@@ -584,7 +584,7 @@ scroll; any other key closes."
     (render:fill-rect scr (wt:Rect (+ bx 1) (+ by 1) inner-w (- box-h 2)) #\Space bg)
     ;; Title
     (screen:screen-set-string scr (+ by 1) (+ bx 3) "New Project"
-                              (color:Style color:accent-fg color:panel-bg color:AttrBold))
+                              (color:Style (color:accent-fg) (color:panel-bg) color:AttrBold))
     ;; Labels
     (screen:screen-set-string scr (+ by 3) (+ bx 2) "Project name:" label-s)
     (screen:screen-set-string scr (+ by 4) (+ bx 2) "Location:    " label-s)
@@ -745,20 +745,20 @@ scroll; any other key closes."
     (let scr = (.terminal-screen term))
     (let cols = (term:terminal-cols term))
     (let rows = (term:terminal-rows term))
-    (let bg = (color:Style color:text-fg
-                           color:panel-bg color:AttrNone))
-    (let border-s = (color:Style color:border-fg
-                                 color:panel-bg color:AttrNone))
-    (let label-s = (color:Style color:text-dim-fg
-                                color:panel-bg color:AttrNone))
-    (let field-s = (color:Style color:text-fg
-                                color:field-bg color:AttrNone))
-    (let active-s = (color:Style color:info-fg
-                                 color:field-bg color:AttrNone))
-    (let btn-s = (color:Style color:text-dim-fg
-                              color:panel-bg color:AttrNone))
-    (let btn-sel = (color:Style color:text-fg
-                                color:accent-fg color:AttrBold))
+    (let bg = (color:Style (color:text-fg)
+                           (color:panel-bg) color:AttrNone))
+    (let border-s = (color:Style (color:border-fg)
+                                 (color:panel-bg) color:AttrNone))
+    (let label-s = (color:Style (color:text-dim-fg)
+                                (color:panel-bg) color:AttrNone))
+    (let field-s = (color:Style (color:text-fg)
+                                (color:field-bg) color:AttrNone))
+    (let active-s = (color:Style (color:info-fg)
+                                 (color:field-bg) color:AttrNone))
+    (let btn-s = (color:Style (color:text-dim-fg)
+                              (color:panel-bg) color:AttrNone))
+    (let btn-sel = (color:Style (color:text-fg)
+                                (color:accent-fg) color:AttrBold))
     (let box-w = (min 70 (- cols 4)))
     (let box-h = 12)
     (let bx = (lisp (-> UFix) (cols box-w) (cl:max 0 (cl:floor (cl:- cols box-w) 2))))
@@ -800,7 +800,7 @@ scroll; any other key closes."
     (render:fill-rect scr (wt:Rect (+ bx 1) (+ by 1) inner-w (- box-h 2)) #\Space bg)
     ;; Title
     (screen:screen-set-string scr (+ by 1) (+ bx 3) "Build Executable"
-                              (color:Style color:accent-fg color:panel-bg color:AttrBold))
+                              (color:Style (color:accent-fg) (color:panel-bg) color:AttrBold))
     ;; Labels
     (screen:screen-set-string scr (+ by 3) (+ bx 2) "Project .asd:" label-s)
     (screen:screen-set-string scr (+ by 4) (+ bx 2) "Output file: " label-s)

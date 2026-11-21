@@ -630,6 +630,7 @@
     (let auto-hide-tree = (.config-auto-hide-tree-pane config))
     (let lang = (.config-repl-language config))
     (let pkg = (.config-default-package config))
+    (let theme = (.config-theme config))
     (let check-updates = (.config-check-for-updates config))
     ;; Extract Optional String to a nullable CL string
     (let init-str = (match (.config-repl-init config)
@@ -644,7 +645,7 @@
     (let has-paths = (match (.config-project-roots config)
                       ((Cons _ _) True)
                       ((Nil) False)))
-    (lisp (-> Boolean) (se auto-hide-tree lang pkg check-updates init-str has-init path-str has-paths)
+    (lisp (-> Boolean) (se auto-hide-tree lang pkg theme check-updates init-str has-init path-str has-paths)
       (cl:let ((path (cl:merge-pathnames ".mine"
                                           (cl:user-homedir-pathname))))
         (cl:handler-case
@@ -660,6 +661,7 @@
                            (cl:if auto-hide-tree "t" "nil"))
                 (cl:format out " :repl-language ~S~%" lang)
                 (cl:format out " :default-package ~S~%" pkg)
+                 (cl:format out " :theme ~S~%" theme)
                 (cl:format out " :check-for-updates ~A~%"
                            (cl:if check-updates "t" "nil"))
                 (cl:when has-init
@@ -771,7 +773,7 @@
     (when best
       (draw-centered scr (+ mid 3)
         "--best-effort enabled, some features may not work."
-        (color:Style color:error-fg color:black color:AttrBold)))
+        (color:Style (color:error-fg) color:black color:AttrBold)))
     (draw-centered scr (+ mid 4) "Press any key to continue." style-italic)
     ;; Draw wizard art centered below
     (when (>= cols 50)
@@ -940,7 +942,7 @@
     (show-tip terminal)
 
     ;; Write config and show result
-    (let config = (cfg:MineConfig se True lang pkg init 4096 project-roots check-updates))
+    (let config = (cfg:MineConfig se True lang pkg init 4096 project-roots "default" check-updates))
     (let _ok = (write-config! config))
     (show-done terminal)
 

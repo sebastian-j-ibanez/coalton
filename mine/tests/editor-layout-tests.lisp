@@ -110,7 +110,7 @@
                 (push row covered)))))))))
 
 (defun check-editor-input-viewport-matches-rendering ()
-  (let* ((iw (mine/widget/input:input-widget-new "> " mine/term/color:default-style mine/term/color:default-style))
+  (let* ((iw (mine/widget/input:input-widget-new "> " (mine/term/color:default-style) (mine/term/color:default-style)))
          (text (format nil "ignored earlier line~%~C界abc" #\Tab))
          (rect (wt:Rect 10 5 8 1))
          (scr (mine/term/screen:screen-new 40 12)))
@@ -175,18 +175,18 @@
          (context (mine-tests/editor-layout::captured-search-context spans)))
     (mine/pane/editor:editor-pane-render-with-context ep scr rect gb cs context)
     (loop for offset from 0
-          for color in (list mine/term/color:search-current-bg mine/term/color:dark-red
+          for color in (list (mine/term/color:search-current-bg) mine/term/color:dark-red
                              mine/term/color:slate mine/term/color:brown)
           do (%check (equalp color (mine-tests/editor-layout::screen-cell-background scr (+ text-x offset) 1))
                      "Render context should apply its captured style at offset ~D" offset))
     (mine/pane/editor:editor-pane-render-with-context
      ep scr rect gb cs (mine/pane/editor:editor-render-context buf:ModePlainText nil coalton:None))
     (loop for offset from 0 to 3
-          do (%check (equalp mine/term/color:current-line-bg
+          do (%check (equalp (mine/term/color:current-line-bg)
                               (mine-tests/editor-layout::screen-cell-background scr (+ text-x offset) 1))
                      "A fresh render context should not inherit previous highlights at offset ~D" offset))
     (mine/term/screen:screen-clear scr)
-    (mine/term/screen:screen-set-cell scr 1 3 #\X mine/term/color:default-style)
+    (mine/term/screen:screen-set-cell scr 1 3 #\X (mine/term/color:default-style))
     (mine/pane/editor:editor-pane-render-with-context
      ep scr (wt:Rect 1 1 2 1) gb cs context)
     (%check (char= #\X (mine-tests/editor-layout::screen-cell-character scr 3 1))
@@ -233,7 +233,7 @@
             "Scrolled multiline strings should retain source-level syntax classification")))
 
 (defun check-repl-output-selection-uses-visual-columns ()
-  (let* ((tw (mine/widget/text:text-widget-new mine/term/color:default-style))
+  (let* ((tw (mine/widget/text:text-widget-new (mine/term/color:default-style)))
          (text (format nil "A界e~CZ" (code-char #x301)))
          (scr (mine/term/screen:screen-new 12 2))
          (rect (wt:Rect 2 0 5 1)))
@@ -242,12 +242,12 @@
     (mine/widget/text:text-widget-extend-selection-at-column! tw 0 4)
     (%check (string= (subseq text 1 4) (mine/widget/text:text-widget-selected-text tw))
             "Output selection should copy whole wide characters and their combining suffixes")
-    (mine/term/screen:screen-set-cell scr 0 7 #\X mine/term/color:default-style)
+    (mine/term/screen:screen-set-cell scr 0 7 #\X (mine/term/color:default-style))
     (mine/widget/text:text-widget-render tw scr rect)
-    (%check (equalp mine/term/color:highlight-bg
+    (%check (equalp (mine/term/color:highlight-bg)
                     (mine-tests/editor-layout::screen-cell-background scr 3 0))
             "Output highlight should begin at the visual column")
-    (%check (equalp mine/term/color:highlight-bg
+    (%check (equalp (mine/term/color:highlight-bg)
                     (mine-tests/editor-layout::screen-cell-background scr 5 0))
             "Output highlight should include the final selected display cell")
     (%check (char= #\X (mine-tests/editor-layout::screen-cell-character scr 7 0))
@@ -382,10 +382,10 @@
         (send (mine/event/types:EvMouse input:MouseDrag input:MouseLeft 9 y))
         (render)
         (%check (loop :for x :from 2 :below 9
-                      :always (equalp mine/term/color:highlight-bg
+                      :always (equalp (mine/term/color:highlight-bg)
                                       (mine-tests/editor-layout::screen-cell-background scr x y)))
                 "The selected input text was not highlighted")
-        (%check (not (equalp mine/term/color:highlight-bg
+        (%check (not (equalp (mine/term/color:highlight-bg)
                              (mine-tests/editor-layout::screen-cell-background scr 9 y)))
                 "The input highlight extended past the selection")
         (%call-with-replaced-runtime-function
@@ -493,7 +493,7 @@
                           'string))
              (start (search text row)))
         (loop :for i :below (length text)
-              :when (equalp mine/term/color:match-paren-bg
+              :when (equalp (mine/term/color:match-paren-bg)
                             (mine-tests/editor-layout::screen-cell-background scr (+ start i) 1))
                 :collect i)))))
 

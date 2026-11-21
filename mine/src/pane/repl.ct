@@ -19,7 +19,7 @@
    (#:ev #:mine/event/types))
   (:export
    #:ReplPane
-   #:repl-pane-new
+   #:repl-pane-new #:repl-pane-refresh-theme!
    #:repl-pane-render
    #:ReplGeometry
    #:repl-pane-geometry #:repl-pane-input-viewport #:repl-pane-completion-anchor
@@ -74,19 +74,27 @@
   (declare repl-pane-new (Void -> ReplPane))
   (define (repl-pane-new)
     "Create a new REPL pane with the default Coalton prompt."
-    (let prompt-style = (color:Style color:accent-fg
-                                     color:repl-bg
+    (let prompt-style = (color:Style (color:accent-fg)
+                                     (color:repl-bg)
                                      color:AttrBold))
-    (let text-style = (color:Style color:text-fg
-                                   color:repl-bg
+    (let text-style = (color:Style (color:text-fg)
+                                   (color:repl-bg)
                                    color:AttrNone))
     (let iw = (widget-input:input-widget-new "> " prompt-style text-style))
     (widget-input:input-widget-set-hint! iw "Shift+Enter for newline")
-    (ReplPane (widget-text:text-widget-new color:default-style)
+    (ReplPane (widget-text:text-widget-new text-style)
               iw
               (cell:new (seq:new))
               (cell:new 0)
               (cell:new "> ")))
+
+  (declare repl-pane-refresh-theme! (ReplPane -> Void))
+  (define (repl-pane-refresh-theme! rp)
+    (let prompt-style = (color:Style (color:accent-fg) (color:repl-bg) color:AttrBold))
+    (let text-style = (color:Style (color:text-fg) (color:repl-bg) color:AttrNone))
+    (widget-input:input-widget-set-styles! (.input-widget rp) prompt-style text-style)
+    (widget-text:text-widget-set-style! (.output rp) text-style)
+    (values))
 
   ;;; Output management
 
@@ -538,11 +546,11 @@ Input area grows dynamically based on line count, up to half the pane height."
        ;; Reserve the scrollbar's column so it cannot overwrite output text.
        (let scroll-off = (cell:read (.tw-scroll (.output rp))))
        (let sb-col = (- (+ (.rect-x rect) (.rect-width rect)) 1))
-       (let track-s = (color:Style color:scrollbar-track-fg
-                                   color:scrollbar-track-bg
+       (let track-s = (color:Style (color:scrollbar-track-fg)
+                                   (color:scrollbar-track-bg)
                                    color:AttrNone))
-       (let thumb-s = (color:Style color:scrollbar-thumb-fg
-                                   color:scrollbar-track-bg
+       (let thumb-s = (color:Style (color:scrollbar-thumb-fg)
+                                   (color:scrollbar-track-bg)
                                    color:AttrNone))
        (when scrollbar?
          (render:draw-scrollbar scr sb-col (.rect-y rect) output-h

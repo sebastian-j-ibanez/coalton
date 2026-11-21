@@ -16,4 +16,5 @@
     (config-repl-init          (Optional String))
     (config-repl-heap-size     UFix)
     (config-project-roots      (List String))
+    (config-theme              String)
     (config-check-for-updates  Boolean)))

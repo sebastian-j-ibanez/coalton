@@ -45,7 +45,7 @@
   (declare default-cell (Void -> ScreenCell))
   (define (default-cell)
     "A blank screen cell with default style."
-    (ScreenCell #\Space color:default-style 1))
+    (ScreenCell #\Space (color:default-style) 1))
 
   (declare make-buffer (UFix -> (vec:Vector ScreenCell)))
   (define (make-buffer size)
@@ -57,7 +57,7 @@
     "Allocate a buffer of sentinel cells that won't match any real content.
 Used for the front buffer after resize to force a full re-render."
     (let nul = (lisp (-> Char) () (cl:code-char 0)))
-    (vec:with-initial-element size (ScreenCell nul color:default-style 1)))
+    (vec:with-initial-element size (ScreenCell nul (color:default-style) 1)))
 
   ;;; Constructor
 
@@ -205,7 +205,7 @@ Uses a dirty front buffer to force the next flush to re-emit every cell."
     (let front = (cell:read (.screen-front scr)))
     (let size = (* (screen-w scr) (screen-h scr)))
     (let nul = (lisp (-> Char) () (cl:code-char 0)))
-    (let dirty = (ScreenCell nul color:default-style 1))
+    (let dirty = (ScreenCell nul (color:default-style) 1))
     (lisp (-> Void) (front size dirty)
       (cl:dotimes (i size)
         (cl:setf (cl:aref front i) dirty))

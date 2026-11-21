@@ -440,25 +440,25 @@
     (let row = (.rect-y rect))
     (let max-col = (+ (.rect-x rect) (.rect-width rect)))
     ;; Bar style: Aluminium 3 on Aluminium 5
-    (let bar-style = (color:Style color:text-dim-fg
-                                  color:status-bar-bg
+    (let bar-style = (color:Style (color:text-dim-fg)
+                                  (color:status-bar-bg)
                                   color:AttrNone))
     ;; Active title: bright on Sky Blue 2
-    (let active-style = (color:Style color:text-fg
-                                     color:accent-bg
+    (let active-style = (color:Style (color:text-fg)
+                                     (color:accent-bg)
                                      color:AttrBold))
     ;; Normal title: bold on bar bg
-    (let title-style = (color:Style color:text-fg
-                                    color:status-bar-bg
+    (let title-style = (color:Style (color:text-fg)
+                                    (color:status-bar-bg)
                                     color:AttrBold))
     ;; Fill the bar
     (render:fill-rect scr rect #\Space bar-style)
     ;; Brand style: bright baby blue bold for "mine" title
-    (let brand-style = (color:Style color:baby-blue
-                                    color:status-bar-bg
+    (let brand-style = (color:Style (color:brand-fg)
+                                    (color:status-bar-bg)
                                     color:AttrBold))
-    (let active-brand = (color:Style color:accent-fg
-                                     color:accent-bg
+    (let active-brand = (color:Style (color:accent-fg)
+                                     (color:accent-bg)
                                      color:AttrBold))
     ;; Draw titles
     (let open-idx = (cell:read (.mb-open-index mb)))
@@ -518,28 +518,28 @@
        (let bx2 = (if (> (+ bx bw) cols) (- cols bw) bx))
        (let cx2 = (+ bx2 1))
        ;; Styles
-       (let bg = (color:Style color:text-fg
-                              color:panel-bg
+       (let bg = (color:Style (color:text-fg)
+                              (color:panel-bg)
                               color:AttrNone))
-       (let sel-style = (color:Style color:text-fg
-                                     color:accent-bg
+       (let sel-style = (color:Style (color:text-fg)
+                                     (color:accent-bg)
                                      color:AttrNone))
-       (let key-style = (color:Style color:text-dimmer-fg
-                                     color:panel-bg
+       (let key-style = (color:Style (color:text-dimmer-fg)
+                                     (color:panel-bg)
                                      color:AttrNone))
-       (let sel-key-style = (color:Style color:text-dim-fg
-                                         color:accent-bg
+       (let sel-key-style = (color:Style (color:text-dim-fg)
+                                         (color:accent-bg)
                                          color:AttrNone))
-       (let border-style = (color:Style color:border-fg
-                                        color:panel-bg
+       (let border-style = (color:Style (color:border-fg)
+                                        (color:panel-bg)
                                         color:AttrNone))
        ;; Draw border
        (render:draw-box scr (wt:Rect bx2 by bw bh) border-style)
        ;; Fill content area
        (render:fill-rect scr (wt:Rect cx2 (+ cy 1) cw ch) #\Space bg)
        ;; Disabled item style
-       (let disabled-style = (color:Style color:text-dimmer-fg
-                                          color:panel-bg
+       (let disabled-style = (color:Style (color:text-dimmer-fg)
+                                          (color:panel-bg)
                                           color:AttrNone))
        ;; Draw items
        (let selected = (cell:read (.mb-selected mb)))

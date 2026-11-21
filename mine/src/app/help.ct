@@ -252,11 +252,11 @@ automatically based on each item's height."
   (declare %draw-help-content (screen:Screen * UFix * UFix * UFix -> Void))
   (define (%draw-help-content scr cols rows scroll)
     "Draw the help screen content with SCROLL offset."
-    (let bg = (color:Style color:text-fg color:panel-bg color:AttrNone))
-    (let heading-s = (color:Style color:accent-fg color:panel-bg color:AttrBold))
-    (let key-s = (color:Style color:info-fg color:panel-bg color:AttrBold))
+    (let bg = (color:Style (color:text-fg) (color:panel-bg) color:AttrNone))
+    (let heading-s = (color:Style (color:accent-fg) (color:panel-bg) color:AttrBold))
+    (let key-s = (color:Style (color:info-fg) (color:panel-bg) color:AttrBold))
     (let desc-s = bg)
-    (let tip-s = (color:Style color:text-dimmer-fg color:panel-bg color:AttrItalic))
+    (let tip-s = (color:Style (color:text-dimmer-fg) (color:panel-bg) color:AttrItalic))
     (let para-s = bg)
     ;; Wrap prose so it ends before the scrollbar (text starts at col 5,
     ;; scrollbar at col cols-1, with a 1-col gap).
@@ -272,11 +272,11 @@ automatically based on each item's height."
     (screen:screen-set-string scr footer-y 3 "↑/↓ to scroll, Enter to close" tip-s)
     ;; Scrollbar on right edge (above footer). Total includes the leading
     ;; top-padding row, matching the offset passed to draw-help-items above.
-    (let track-s = (color:Style color:scrollbar-track-fg
-                                color:scrollbar-track-bg
+    (let track-s = (color:Style (color:scrollbar-track-fg)
+                                (color:scrollbar-track-bg)
                                 color:AttrNone))
-    (let thumb-s = (color:Style color:scrollbar-thumb-fg
-                                color:scrollbar-track-bg
+    (let thumb-s = (color:Style (color:scrollbar-thumb-fg)
+                                (color:scrollbar-track-bg)
                                 color:AttrNone))
     (let sb-col = (if (> cols 0) (- cols 1) 0))
     (let sb-h = (if (> rows 1) (- rows 1) 0))

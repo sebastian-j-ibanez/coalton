@@ -102,6 +102,33 @@
                   (cl:format cl:nil "~Dm" m)
                   (cl:format cl:nil "~Dm ~Ds" m s)))))
 
+(cl:defun %command-line-theme-override (args)
+  (cl:loop for rest-args on (cl:rest args)
+           for argument = (cl:first rest-args)
+           when (cl:string= argument "--theme")
+             do (cl:let ((value (cl:second rest-args)))
+                  (cl:unless (cl:and value (cl:not (uiop:string-prefix-p "--" value)))
+                    (cl:error "--theme requires a theme name or path"))
+                  (cl:return value))))
+
+(cl:defun %command-line-file-arguments (args)
+  (cl:loop with rest-args = (cl:rest args)
+           while rest-args
+           for argument = (cl:pop rest-args)
+           if (cl:string= argument "--theme")
+             do (cl:when rest-args (cl:pop rest-args))
+           else unless (uiop:string-prefix-p "--" argument)
+             collect argument))
+
+(cl:defun %theme-command-p (command)
+  (cl:or (cl:string= command "theme")
+         (uiop:string-prefix-p "theme " command)))
+
+(cl:defun %theme-command-argument (command)
+  (cl:if (cl:string= command "theme")
+         ""
+         (cl:string-trim (cl:list #\Space #\Tab) (cl:subseq command 6))))
+
 (coalton-toplevel
 
 ;;; Layout helpers
@@ -242,14 +269,14 @@
     (when (> (.rect-height rect) 0)
       (let y = (.rect-y rect))
       (let x = (.rect-x rect))
-      (let bg-style = (color:Style color:text-dimmer-fg
-                                   color:repl-bg
+      (let bg-style = (color:Style (color:text-dimmer-fg)
+                                   (color:repl-bg)
                                    color:AttrNone))
-      (let prompt-style = (color:Style color:accent-fg
-                                       color:repl-bg
+      (let prompt-style = (color:Style (color:accent-fg)
+                                       (color:repl-bg)
                                        color:AttrBold))
-      (let hint-style = (color:Style color:text-dimmer-fg
-                                     color:repl-bg
+      (let hint-style = (color:Style (color:text-dimmer-fg)
+                                     (color:repl-bg)
                                      color:AttrItalic))
       (render:fill-rect scr rect #\Space bg-style)
       (screen:screen-set-string scr y x "> " prompt-style)
@@ -268,8 +295,8 @@
       (let text = (if frozen
                       "Ctrl+t to auto-hide"
                       "Ctrl+t to freeze"))
-      (let style = (color:Style color:text-dimmer-fg
-                                color:black
+      (let style = (color:Style (color:text-dimmer-fg)
+                                (color:background-color)
                                 color:AttrItalic))
       (let text-x = (if (> w 2) (+ x 1) x))
       (let text-w = (if (> w 2) (- w 1) w))
@@ -511,17 +538,17 @@
     (let x = (the UFix (lisp (-> UFix) (cols w) (cl:floor (cl:- cols w) 2))))
     (let y = (the UFix (lisp (-> UFix) (rows) (cl:floor rows 3))))
     (let h = (min (+ (+ 3 comp-rows) footer-rows) (- rows y)))
-    (let border-style = (color:Style color:text-dim-fg
-                                     color:panel-bg
+    (let border-style = (color:Style (color:text-dim-fg)
+                                     (color:panel-bg)
                                      color:AttrNone))
-    (let input-style = (color:Style color:text-fg
-                                    color:panel-bg
+    (let input-style = (color:Style (color:text-fg)
+                                    (color:panel-bg)
                                     color:AttrNone))
-    (let comp-style = (color:Style color:text-dim-fg
-                                   color:panel-bg
+    (let comp-style = (color:Style (color:text-dim-fg)
+                                   (color:panel-bg)
                                    color:AttrNone))
-    (let footer-style = (color:Style color:text-dimmer-fg
-                                     color:panel-bg
+    (let footer-style = (color:Style (color:text-dimmer-fg)
+                                     (color:panel-bg)
                                      color:AttrItalic))
     ;; Draw box
     (render:draw-box scr (wt:Rect x y (+ w 2) h) border-style)
@@ -591,14 +618,14 @@
     (let ry = (.rect-y rect))
     (let rw = (.rect-width rect))
     (let rh = (.rect-height rect))
-    (let bold-blue = (color:Style color:baby-blue color:black color:AttrBold))
-    (let bold = (color:Style color:text-fg color:black color:AttrBold))
-    (let dim = (color:Style color:text-dim-fg color:black color:AttrNone))
+    (let bold-blue = (color:Style (color:brand-fg) (color:background-color) color:AttrBold))
+    (let bold = (color:Style (color:text-fg) (color:background-color) color:AttrBold))
+    (let dim = (color:Style (color:text-dim-fg) (color:background-color) color:AttrNone))
     (let update = (update-check-message st))
     (let has-update = (> (str:length update) 0))
     (let update-offset = (if has-update 1 0))
     (let update-style = (if (update-check-available? st)
-                            (color:Style color:warning-fg color:black color:AttrBold)
+                            (color:Style (color:warning-fg) (color:background-color) color:AttrBold)
                             dim))
     ;; Check if ~/.mine exists
     (let has-config = (lisp (-> Boolean) ()
@@ -674,7 +701,7 @@
                         (+ rx (lisp (-> UFix) (rw warn-w) (cl:floor (cl:- rw warn-w) 2)))
                         rx))
       (render:draw-text scr (+ key-y 5) warn-x warn
-        (color:Style color:error-fg color:black color:AttrBold)))
+        (color:Style (color:error-fg) (color:background-color) color:AttrBold)))
     (values))
 
 ;;; Editor pane
@@ -701,7 +728,7 @@
        ;; Editor scrollbar
        (editor:editor-pane-render-scrollbar (.ms-editor st) scr editor-rect (buf:buffer-gap buf)))
       ((None)
-       (render:fill-rect scr editor-rect #\Space color:default-style)
+       (render:fill-rect scr editor-rect #\Space (color:default-style))
        (render-welcome st scr editor-rect))))
 
   (declare render-editor-cursor (MineState * screen:Screen -> Void))
@@ -725,11 +752,11 @@
     "Render the editor status line: mode, filename, modified, line:col."
     (let y = (.rect-y rect))
     (let x = (.rect-x rect))
-    (let style = (color:Style color:silver
-                              color:onyx
+    (let style = (color:Style (color:text-dim-fg)
+                              (color:status-bar-bg)
                               color:AttrNone))
-    (let val-style = (color:Style color:text-fg
-                                  color:onyx
+    (let val-style = (color:Style (color:text-fg)
+                                  (color:status-bar-bg)
                                   color:AttrNone))
     (render:fill-rect scr rect #\Space style)
     (match (mgr:bufmgr-current (.ms-bufmgr st))
@@ -762,7 +789,7 @@
   (declare render-tree-separator (MineState * screen:Screen * UFix * UFix * UFix -> Void))
   (define (render-tree-separator _st scr x start-y height)
     "Draw a vertical separator line at column X."
-    (let sep-style = (color:with-attr color:default-style color:AttrDim))
+    (let sep-style = (color:with-attr (color:default-style) color:AttrDim))
     (%draw-vsep scr x start-y height sep-style))
 
   (declare %draw-vsep (screen:Screen * UFix * UFix * UFix * color:Style -> Void))
@@ -784,14 +811,14 @@
     "Render the REPL status line."
     (let y = (.rect-y rect))
     (let x = (.rect-x rect))
-    (let style = (color:Style color:silver
-                              color:onyx
+    (let style = (color:Style (color:text-dim-fg)
+                              (color:status-bar-bg)
                               color:AttrNone))
-    (let label-style = (color:Style color:text-dimmer-fg
-                                    color:onyx
+    (let label-style = (color:Style (color:text-dimmer-fg)
+                                    (color:status-bar-bg)
                                     color:AttrNone))
-    (let val-style = (color:Style color:text-fg
-                                  color:onyx
+    (let val-style = (color:Style (color:text-fg)
+                                  (color:status-bar-bg)
                                   color:AttrNone))
     (render:fill-rect scr rect #\Space style)
     ;; Package
@@ -814,23 +841,23 @@
     (cond
       ((and (not has-conn) (not (lifecycle:runtime-process-alive? (.ms-runtime st)))
             (not busy))
-       (let dead-s = (color:Style color:error-fg
-                                  color:onyx
+       (let dead-s = (color:Style (color:error-fg)
+                                  (color:status-bar-bg)
                                   color:AttrBold))
        (screen:screen-set-string scr y (+ col2 8) "Dead" dead-s))
       (io-req
-       (let query-s = (color:Style color:accent-fg
-                                   color:onyx
+       (let query-s = (color:Style (color:accent-fg)
+                                   (color:status-bar-bg)
                                    color:AttrBold))
        (screen:screen-set-string scr y (+ col2 8) "Query" query-s))
       ((cell:read (.ms-debugger-active st))
-       (let debug-s = (color:Style color:warning-fg
-                                   color:onyx
+       (let debug-s = (color:Style (color:warning-fg)
+                                   (color:status-bar-bg)
                                    color:AttrBold))
        (screen:screen-set-string scr y (+ col2 8) "Debug" debug-s))
       (busy
-       (let busy-s = (color:Style color:info-fg
-                                  color:onyx
+       (let busy-s = (color:Style (color:info-fg)
+                                  (color:status-bar-bg)
                                   color:AttrBold))
        (let busy-label =
          (match (cell:read (.ms-busy-activity st))
@@ -839,8 +866,8 @@
        (let spin-str = (into (spinner:spinner-char (.ms-spinner st))))
        (screen:screen-set-string scr y (+ col2 8) (<> busy-label (<> " " spin-str)) busy-s))
       (True
-       (let ready-s = (color:Style color:chameleon
-                                   color:onyx
+       (let ready-s = (color:Style (color:syntax-number-fg)
+                                   (color:status-bar-bg)
                                    color:AttrNone))
        (screen:screen-set-string scr y (+ col2 8) "Ready" ready-s)))
     (let col3 = (+ col2 15))
@@ -1642,6 +1669,27 @@ in the REPL as a first start does."
        True)
       ((None) False)))
 
+  (declare apply-theme-command! (MineState * String -> Void))
+  (define (apply-theme-command! st command)
+    (let error-message =
+      (lisp (-> (Optional String)) (command)
+        (cl:let* ((argument (%theme-command-argument command))
+                  (message (cl:if (cl:zerop (cl:length argument))
+                                  (mine/theme/loader:reload-current-theme)
+                                  (mine/theme/loader:load-and-install-theme argument))))
+          (cl:if message (Some message) None))))
+    (match error-message
+      ((Some message)
+       (repl:repl-pane-append-system! (.ms-repl st) (<> ";; ERROR: " message)))
+      ((None)
+       (repl:repl-pane-refresh-theme! (.ms-repl st))
+       (mini:minibuffer-refresh-theme! (.ms-minibuffer st))
+       (let name = (lisp (-> String) ()
+                    (mine/theme/loader:current-theme-designator)))
+       (repl:repl-pane-append-system! (.ms-repl st)
+                                      (<> ";; Theme loaded: " name))))
+    (values))
+
   (declare repl-command! (MineState * String -> Void))
   (define (repl-command! st cmd)
     "Dispatch a comma command."
@@ -1664,12 +1712,15 @@ in the REPL as a first start does."
        (when (== (cell:read (.ms-repl-package st)) "COALTON-USER")
          (cell:write! (.ms-repl-package st) "CL-USER"))
        (repl:repl-pane-append-system! (.ms-repl st) ";; Language mode: Lisp"))
+      ((lisp (-> Boolean) (trimmed) (%theme-command-p trimmed))
+       (apply-theme-command! st trimmed))
       ((list:member trimmed ["help" "h" "?"])
        (repl:repl-pane-append-system! (.ms-repl st) ";; REPL commands:")
        (repl:repl-pane-append-system! (.ms-repl st) ";;   ,restart  — restart the runtime")
        (repl:repl-pane-append-system! (.ms-repl st) ";;   ,clear    — clear REPL output")
        (repl:repl-pane-append-system! (.ms-repl st) ";;   ,coalton  — switch to Coalton mode")
-       (repl:repl-pane-append-system! (.ms-repl st) ";;   ,lisp     — switch to Lisp mode")
+       (repl:repl-pane-append-system! (.ms-repl st) ";;   ,lisp     - switch to Lisp mode")
+       (repl:repl-pane-append-system! (.ms-repl st) ";;   ,theme [name] - reload or select a theme")
        (repl:repl-pane-append-system! (.ms-repl st) ";;   ,help     — show this help"))
       (True
        (repl:repl-pane-append-output! (.ms-repl st)
@@ -2258,14 +2309,14 @@ Uses the preceding (in-package ...) form to determine the compilation package."
     (let by = (lisp (-> UFix) (rows box-h) (cl:max 0 (cl:floor (cl:- rows box-h) 2))))
     (let inner-w = (- box-w 2))
     (let inner-h = (- box-h 4))
-    (let bg = (color:Style color:text-fg
-                           color:field-bg color:AttrNone))
-    (let border-s = (color:Style color:border-fg
-                                 color:panel-bg color:AttrNone))
-    (let text-s = (color:Style color:text-dim-fg
-                               color:field-bg color:AttrNone))
-    (let title-s = (color:Style color:accent-fg
-                                color:panel-bg color:AttrBold))
+    (let bg = (color:Style (color:text-fg)
+                           (color:field-bg) color:AttrNone))
+    (let border-s = (color:Style (color:border-fg)
+                                 (color:panel-bg) color:AttrNone))
+    (let text-s = (color:Style (color:text-dim-fg)
+                               (color:field-bg) color:AttrNone))
+    (let title-s = (color:Style (color:accent-fg)
+                                (color:panel-bg) color:AttrBold))
     (render:draw-box scr (wt:Rect bx by box-w box-h) border-s)
     (render:fill-rect scr (wt:Rect (+ bx 1) (+ by 1) inner-w (- box-h 2)) #\Space bg)
     (let title = (if done "Build Complete" "Building..."))
@@ -2277,7 +2328,7 @@ Uses the preceding (in-package ...) form to determine the compilation package."
     (screen:screen-hide-cursor scr)
     (when done
       (screen:screen-set-string scr (+ by (- box-h 2)) (+ bx 2) "Press any key to close"
-                                (color:Style color:text-dimmer-fg color:field-bg color:AttrItalic)))
+                                (color:Style (color:text-dimmer-fg) (color:field-bg) color:AttrItalic)))
     (term:terminal-flush term)
     (cond
       (done
@@ -4795,18 +4846,18 @@ TreeFile other than an .asd file, which the tree lists before the sources."
     (let scr = (.terminal-screen term))
     (let cols = (term:terminal-cols term))
     (let rows = (term:terminal-rows term))
-    (let bg = (color:Style color:text-fg
-                           color:error-dialog-bg
+    (let bg = (color:Style (color:text-fg)
+                           (color:error-dialog-bg)
                            color:AttrNone))
     (let dim = (color:Style color:light-grey
-                            color:error-dialog-bg
+                            (color:error-dialog-bg)
                             color:AttrNone))
     (let box-w = (min (- cols 4) 60))
     (let box-h = 7)
     (let bx = (lisp (-> UFix) (cols box-w) (cl:max 0 (cl:floor (cl:- cols box-w) 2))))
     (let by = (lisp (-> UFix) (rows box-h) (cl:max 0 (cl:floor (cl:- rows box-h) 2))))
     (let border-style = (color:Style color:coral
-                                     color:error-dialog-bg
+                                     (color:error-dialog-bg)
                                      color:AttrNone))
     (screen:screen-clear scr)
     (render:draw-box scr (wt:Rect bx by box-w box-h) border-style)
@@ -4847,6 +4898,28 @@ TreeFile other than an .asd file, which the tree lists before the sources."
                     ((Err msg)
                      (%show-config-error! term msg)
                      (cfg:default-config))))
+    ;; Resolve and install the selected theme before constructing styled widgets.
+    (let configured-theme = (.config-theme config))
+    (let theme-selection =
+      (lisp (-> (Result String String)) (args configured-theme)
+        (cl:handler-case
+            (Ok (cl:or (%command-line-theme-override args) configured-theme))
+          (cl:error (condition) (Err (cl:format cl:nil "~A" condition))))))
+    (let theme-name =
+      (match theme-selection
+        ((Ok name) name)
+        ((Err msg)
+         (%show-config-error! term msg)
+         (.config-theme config))))
+    (let theme-error =
+      (lisp (-> (Optional String)) (theme-name)
+        (cl:let ((message (mine/theme/loader:load-and-install-theme theme-name)))
+          (cl:when message
+            (mine/theme/loader:load-and-install-theme "default"))
+          (cl:if message (Some message) None))))
+    (match theme-error
+      ((Some msg) (%show-config-error! term (<> "Theme error: " msg)))
+      ((None) (values)))
     ;; Invalidate diagnostic storage when the document changes.
     (lisp (-> Void) ()
       (cl:setf mine/buffer/buffer::*buffer-dirty-hook*
@@ -4867,7 +4940,8 @@ TreeFile other than an .asd file, which the tree lists before the sources."
     (let tp = (.ms-tree st))
     (start-update-check! st)
     ;; Open a file if given on the command line
-    (let file-args = (filter (fn (a) (not (str:substring? "--" a))) (list:cdr args)))
+    (let file-args = (lisp (-> (List String)) (args)
+                       (%command-line-file-arguments args)))
     (match file-args
       ((Cons path _)
        (cond
@@ -5353,22 +5427,22 @@ Returns (Some native-box) holding (process . log-stream), or None on error."
                 (box-x (cl:min (cl:+ anchor-col 1)
                                (cl:max 0 (cl:- screen-w box-w))))
                 (border-fg (cl:if error-p
-                                  mine/term/color:error-fg
-                                  mine/term/color:info-fg))
+                                  (mine/term/color:error-fg)
+                                  (mine/term/color:info-fg)))
                 (border-style (mine/term/color:Style border-fg
-                                                       mine/term/color:panel-bg
+                                                       (mine/term/color:panel-bg)
                                                        mine/term/color:AttrNone))
                 (title-style (mine/term/color:Style border-fg
-                                                     mine/term/color:panel-bg
+                                                     (mine/term/color:panel-bg)
                                                      mine/term/color:AttrBold))
-                (body-style (mine/term/color:Style mine/term/color:text-fg
-                                                    mine/term/color:panel-bg
+                (body-style (mine/term/color:Style (mine/term/color:text-fg)
+                                                    (mine/term/color:panel-bg)
                                                     mine/term/color:AttrNone))
-                (omitted-style (mine/term/color:Style mine/term/color:text-dimmer-fg
-                                                       mine/term/color:panel-bg
+                (omitted-style (mine/term/color:Style (mine/term/color:text-dimmer-fg)
+                                                       (mine/term/color:panel-bg)
                                                        mine/term/color:AttrItalic))
-                (no-values-style (mine/term/color:Style mine/term/color:text-dimmer-fg
-                                                         mine/term/color:panel-bg
+                (no-values-style (mine/term/color:Style (mine/term/color:text-dimmer-fg)
+                                                         (mine/term/color:panel-bg)
                                                          mine/term/color:AttrItalic))
                 (inner-rect (mine/widget/types:Rect
                              (cl:1+ box-x)

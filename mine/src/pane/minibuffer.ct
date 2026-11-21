@@ -14,7 +14,7 @@
    (#:ev #:mine/event/types))
   (:export
    #:Minibuffer
-   #:minibuffer-new
+   #:minibuffer-new #:minibuffer-refresh-theme!
    #:minibuffer-active?
    #:minibuffer-prompt-with-completion!
    #:minibuffer-prompt-symbol-picker!
@@ -50,7 +50,7 @@
 
   (declare minibuffer-new (Void -> Minibuffer))
   (define (minibuffer-new)
-    (Minibuffer (widget-input:input-widget-new "" color:default-style color:default-style)
+    (Minibuffer (widget-input:input-widget-new "" (color:default-style) (color:default-style))
                 (cell:new False)
                 (cell:new None)
                 (cell:new Nil)
@@ -62,6 +62,13 @@
                 (cell:new None)
                 (cell:new None)
                 (cell:new False)))
+
+  (declare minibuffer-refresh-theme! (Minibuffer -> Void))
+  (define (minibuffer-refresh-theme! mb)
+    (widget-input:input-widget-set-styles! (.input-widget mb)
+                                           (color:default-style)
+                                           (color:default-style))
+    (values))
 
   (declare minibuffer-active? (Minibuffer -> Boolean))
   (define (minibuffer-active? mb)

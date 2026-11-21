@@ -24,7 +24,7 @@
 There are also anti-features:
 
 - No ads, no telemetry
-- No plugins, themes, extensions
+- No plugins or extensions
 - No support for other languages
 - No Git integration, no AI
 - Not Emacs
@@ -106,6 +106,32 @@ Whitespace is arbitrary; add as many spaces and newlines as you please. The poss
 - `:project-roots` [`<string>`, `(<string> ...)`]: A string or a list of strings which are root directories where projects are subdirectories. This is where `mine` will search for projects.
     - Examples: `"c:/projects/"`, `("/projects/" "/my/other-projects/")`
 - `:check-for-updates` [`t`, `nil`]: Best-effort check of the Coalton GitHub releases for newer `mine` releases on startup. Values are `t` (check, requires `curl`) or `nil` (do not check, default).
+- `:theme` `<string>`: Select a named TOML theme. Defaults to `"default"`.
+
+### Themes
+
+User themes are loaded from `$MINE_CONFIG_HOME/themes`, `$XDG_CONFIG_HOME/mine/themes` (normally `~/.config/mine/themes`) on Unix, `~/Library/Application Support/mine/themes` on macOS, or `%APPDATA%\\mine\\themes` on Windows. A theme named `my-theme` is stored as `my-theme.toml` and selected with `:theme "my-theme"` in `~/.mine` or `mine --theme my-theme`. In the REPL, `,theme` reloads the active theme and `,theme my-theme` selects another theme for the current session.
+
+```toml
+version = 1
+inherits = "default"
+
+[palette]
+background = "#1e1e2e"
+text = "#cdd6f4"
+blue = "#89b4fa"
+
+[ui]
+background = "background"
+text = "text"
+accent = "blue"
+
+[syntax]
+string = "#a6e3a1"
+constructor = "#f9e2af"
+```
+
+Colors may be `#RRGGBB`, `default`, `ansi:N`, `index:N`, or a name from `[palette]`. Theme files use TOML and support basic or literal strings. Supported tables are `[ui]`, `[editor]`, `[repl]`, `[diagnostic]`, `[scrollbar]`, and `[syntax]`. Themes may inherit another named theme with `inherits`. Diagnostic background keys are `error-background`, `warning-background`, `style-warning-background`, and `info-background`; `[editor]` also supports `quick-result`.
 - `:repl-heap-size-megabytes` `<integer>`: The number of megabytes of memory the REPL should get. Defaults to 4096 MiB.
 - `:app-font-family` `<string>`: The font family to use in the mine desktop app. Defaults to `"Iosevka Fixed Slab Extended"` which comes pre-installed with the app.
 - `:app-font-size` `<integer>`: The font size in pixels to use in the mine desktop app. Defaults to `14`.

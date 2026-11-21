@@ -43,7 +43,7 @@
   :author "Coalton contributors (https://github.com/coalton-lang/coalton)"
   :license "MIT"
   :defsystem-depends-on ("coalton-asdf")
-  :depends-on ("mine/runtime")
+  :depends-on ("mine/runtime" "cl-toml")
   :in-order-to ((asdf:test-op (asdf:test-op "mine-tests")))
   :pathname "src/"
   :serial t
@@ -71,6 +71,11 @@
                  (:ct-file "input")
                  (:ct-file "screen")
                  (:ct-file "terminal")))
+
+   ;; User-selectable themes (depends only on terminal color values)
+   (:module "theme"
+    :serial t
+    :components ((:file "loader")))
 
    ;; Event system
    (:module "event"

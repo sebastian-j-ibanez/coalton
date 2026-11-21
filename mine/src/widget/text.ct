@@ -11,7 +11,7 @@
    (#:str #:coalton/string))
   (:export
    #:TextWidget #:TextWidget
-   #:text-widget-new
+   #:text-widget-new #:text-widget-set-style!
    #:text-widget-append!
    #:text-widget-append-chunk!
    #:text-widget-append-system!
@@ -41,7 +41,7 @@
     (tw-lines       (Cell (vec:Vector String)))
     (tw-flags       (Cell (vec:Vector Boolean)))
     (tw-scroll      (Cell UFix))
-    (tw-style       color:Style)
+    (tw-style       (Cell color:Style))
     (tw-sel-anchor  (Cell (Optional (Tuple UFix UFix))))
     (tw-sel-end     (Cell (Optional (Tuple UFix UFix))))
     (tw-vis-height  (Cell UFix))
@@ -53,11 +53,16 @@
     (TextWidget (cell:new (vec:new))
                 (cell:new (vec:new))
                 (cell:new 0)
-                style
+                (cell:new style)
                 (cell:new None)
                 (cell:new None)
                 (cell:new 20)
                 (cell:new False)))
+
+  (declare text-widget-set-style! (TextWidget * color:Style -> Void))
+  (define (text-widget-set-style! tw style)
+    (cell:write! (.tw-style tw) style)
+    (values))
 
   (declare text-widget-line-count (TextWidget -> UFix))
   (define (text-widget-line-count tw)
@@ -300,7 +305,7 @@
         (let is-system = (vec:index-unsafe line-idx flags))
         (let line-style = (if is-system
                               (color:with-attr
-                                (color:with-fg style color:text-dimmer-fg)
+                                (color:with-fg style (color:text-dimmer-fg))
                                 color:AttrItalic)
                               style))
         (render:draw-text-clipped scr rect line
@@ -353,7 +358,7 @@
     (let lines  = (cell:read (.tw-lines tw)))
     (let scroll = (cell:read (.tw-scroll tw)))
     (let h      = (.rect-height rect))
-    (let style  = (.tw-style tw))
+    (let style  = (cell:read (.tw-style tw)))
     ;; Track visible height for scroll-to-bottom
     (cell:write! (.tw-vis-height tw) h)
     ;; Clear the entire area first so old text doesn't bleed through
@@ -368,5 +373,5 @@
          ((Tuple sel-start sel-end)
           (%render-selection-highlight scr rect lines scroll h
                                        sel-start sel-end
-                                       color:user-selection-style))))
+                                       (color:user-selection-style)))))
       (_ (values)))))

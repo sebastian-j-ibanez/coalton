@@ -52,6 +52,10 @@
                   check-generic-coalton-toplevel-notes-stay-textual
                   check-source-diagnostic-hook-sees-source-error-subclasses
                   check-reader-errors-produce-point-diagnostics
+                  check-custom-theme-loads-palette-colors
+                  check-theme-inheritance-and-reload
+                  check-invalid-theme-keeps-current-theme
+                  check-theme-command-line-options
                   check-symbol-input-fn-alias
                   check-short-lambda-introducer-highlights-as-fn
                   check-chained-short-lambda-introducers-each-highlight

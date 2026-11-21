@@ -490,11 +490,11 @@ those files."
 
 (defun diagnostic-popup-border-color (severity)
   (case severity
-    (:error mine/term/color:error-fg)
-    (:warning mine/term/color:warning-fg)
-    (:style-warning mine/term/color:gold)
-    (:note mine/term/color:accent-fg)
-    (t mine/term/color:border-fg)))
+    (:error (mine/term/color:error-fg))
+    (:warning (mine/term/color:warning-fg))
+    (:style-warning (mine/term/color:style-warning-fg))
+    (:note (mine/term/color:accent-fg))
+    (t (mine/term/color:border-fg))))
 
 (defun render-diagnostic-popup-cl (st scr screen-w screen-h)
   "Render a non-modal diagnostic popup near the editor caret."
@@ -546,15 +546,15 @@ those files."
                              (max 0 (- screen-w box-w))))
                  (border-style (mine/term/color:Style
                                 (diagnostic-popup-border-color severity)
-                                mine/term/color:panel-bg
+                                (mine/term/color:panel-bg)
                                 mine/term/color:AttrNone))
                  (title-style (mine/term/color:Style
                                (diagnostic-popup-border-color severity)
-                               mine/term/color:panel-bg
+                               (mine/term/color:panel-bg)
                                mine/term/color:AttrBold))
                  (body-style (mine/term/color:Style
-                              mine/term/color:text-fg
-                              mine/term/color:panel-bg
+                              (mine/term/color:text-fg)
+                              (mine/term/color:panel-bg)
                               mine/term/color:AttrNone))
                  (inner-rect (mine/widget/types:Rect
                               (1+ box-x)

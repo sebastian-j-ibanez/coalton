@@ -509,8 +509,8 @@ Returns Some path for files, Some empty-string for dirs, None for miss."
                (cond
                  ((.fr-separator row)
                   (let sep-y = (+ (.rect-y rect) row-idx))
-                  (let sep-style = (color:Style color:border-fg
-                                                color:black
+                  (let sep-style = (color:Style (color:border-fg)
+                                                (color:background-color)
                                                 color:AttrNone))
                   (%draw-hsep scr (.rect-x rect) sep-y (.rect-width rect) sep-style)
                   (%draw-tree-rows rest scr rect height scr-off2 sel
@@ -545,32 +545,32 @@ Returns Some path for files, Some empty-string for dirs, None for miss."
                   (let row-style =
                     (cond
                       ((== flat-idx sel)
-                       (color:with-attr color:default-style color:AttrReverse))
+                       (color:with-attr (color:default-style) color:AttrReverse))
                       (is-dir
-                       (color:with-attr color:default-style color:AttrBold))
+                       (color:with-attr (color:default-style) color:AttrBold))
                       (is-preview
-                       (color:with-attr color:default-style color:AttrItalic))
-                      (True color:default-style)))
+                       (color:with-attr (color:default-style) color:AttrItalic))
+                      (True (color:default-style))))
                   (let dirty-style =
-                    (color:Style color:error-fg
+                    (color:Style (color:error-fg)
                                  (.style-bg row-style)
                                  (.style-attr row-style)))
                   (let diag-style =
                     (cond
                       ((== diag-rank 4)
-                       (color:Style color:error-fg
+                       (color:Style (color:error-fg)
                                     (.style-bg row-style)
                                     (.style-attr row-style)))
                       ((== diag-rank 3)
-                       (color:Style color:warning-fg
+                       (color:Style (color:warning-fg)
                                     (.style-bg row-style)
                                     (.style-attr row-style)))
                       ((== diag-rank 2)
-                       (color:Style color:gold
+                       (color:Style (color:style-warning-fg)
                                     (.style-bg row-style)
                                     (.style-attr row-style)))
                       ((== diag-rank 1)
-                       (color:Style color:accent-fg
+                       (color:Style (color:accent-fg)
                                     (.style-bg row-style)
                                     (.style-attr row-style)))
                       (True row-style)))
@@ -644,21 +644,21 @@ hidden while the pane was shorter reappear when it grows."
     (let tree-h = (if (> content-h open-h) (- content-h open-h) 0))
 
     ;; Clear the pane area
-    (render:fill-rect scr rect #\Space color:default-style)
+    (render:fill-rect scr rect #\Space (color:default-style))
 
     (let preview-p = (cell:read (.preview-path tp)))
-    (let sep-style = (color:Style color:border-fg
-                                  color:black
+    (let sep-style = (color:Style (color:border-fg)
+                                  (color:background-color)
                                   color:AttrNone))
     (let rx = (.rect-x rect))
     (let ry = (.rect-y rect))
     (let w = (.rect-width rect))
     (let sb-col = (- (+ rx w) 1))
-    (let track-s = (color:Style color:scrollbar-track-fg
-                                color:scrollbar-track-bg
+    (let track-s = (color:Style (color:scrollbar-track-fg)
+                                (color:scrollbar-track-bg)
                                 color:AttrNone))
-    (let thumb-s = (color:Style color:scrollbar-thumb-fg
-                                color:scrollbar-track-bg
+    (let thumb-s = (color:Style (color:scrollbar-thumb-fg)
+                                (color:scrollbar-track-bg)
                                 color:AttrNone))
 
     ;; Open Files title
@@ -783,8 +783,8 @@ top file shown, as dragging the Project Tree scrollbar does."
                           ((None) False)))
       (let digit-char = (lisp (-> Char) (num) (cl:code-char (cl:+ 49 num))))
       (let style = (if is-current
-                       (color:with-bg color:default-style color:panel-bg)
-                       (color:with-attr color:default-style color:AttrDim)))
+                       (color:with-bg (color:default-style) (color:panel-bg))
+                       (color:with-attr (color:default-style) color:AttrDim)))
       (screen:screen-set-cell scr (+ y num) x digit-char style)
       (%draw-strip-numbers scr x y show-count current-idx (+ num 1))))
 
@@ -792,7 +792,7 @@ top file shown, as dragging the Project Tree scrollbar does."
     (TreePane * screen:Screen * wt:Rect * (Optional String) -> Void))
   (define (tree-pane-render-collapsed tp scr rect current-path)
     "Render a collapsed 1-column strip with file numbers 1-9 and T indicator."
-    (render:fill-rect scr rect #\Space color:default-style)
+    (render:fill-rect scr rect #\Space (color:default-style))
     (let files = (cell:read (.open-files tp)))
     (let file-count = (length files))
     (let show-count = (min 9 file-count))
@@ -807,7 +807,7 @@ top file shown, as dragging the Project Tree scrollbar does."
                              ((Some idx) (>= idx 9))
                              ((None) (> file-count 0))))
       (let t-style = (if t-highlighted
-                         (color:with-bg color:default-style color:panel-bg)
-                         (color:with-attr color:default-style color:AttrDim)))
+                         (color:with-bg (color:default-style) (color:panel-bg))
+                         (color:with-attr (color:default-style) color:AttrDim)))
       (screen:screen-set-cell scr t-y (.rect-x rect) #\T t-style))
     (values)))

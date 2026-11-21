@@ -209,40 +209,40 @@ Returns the next row after all drawn lines."
   ;;; Styles
 
   (define style-bg
-    (color:Style color:text-fg color:panel-bg color:AttrNone))
+    (color:Style (color:text-fg) (color:panel-bg) color:AttrNone))
 
   (define style-heading
-    (color:Style color:accent-fg color:panel-bg color:AttrBold))
+    (color:Style (color:accent-fg) (color:panel-bg) color:AttrBold))
 
   (define style-bold
-    (color:Style color:text-fg color:panel-bg color:AttrBold))
+    (color:Style (color:text-fg) (color:panel-bg) color:AttrBold))
 
   (define style-key
-    (color:Style color:info-fg color:panel-bg color:AttrBold))
+    (color:Style (color:info-fg) (color:panel-bg) color:AttrBold))
 
   (define style-dim
-    (color:Style color:text-dimmer-fg color:panel-bg color:AttrItalic))
+    (color:Style (color:text-dimmer-fg) (color:panel-bg) color:AttrItalic))
 
   (define style-input-bg
-    (color:Style color:text-fg color:aluminium-5 color:AttrNone))
+    (color:Style (color:text-fg) color:aluminium-5 color:AttrNone))
 
   (define style-prompt
-    (color:Style color:accent-fg color:aluminium-5 color:AttrBold))
+    (color:Style (color:accent-fg) color:aluminium-5 color:AttrBold))
 
   (define style-goal
-    (color:Style color:info-fg color:panel-bg color:AttrNone))
+    (color:Style (color:info-fg) (color:panel-bg) color:AttrNone))
 
   (define style-correct
-    (color:Style (color:Color256 46) color:panel-bg color:AttrBold))
+    (color:Style (color:Color256 46) (color:panel-bg) color:AttrBold))
 
   (define style-wrong
-    (color:Style (color:Color256 196) color:panel-bg color:AttrNone))
+    (color:Style (color:Color256 196) (color:panel-bg) color:AttrNone))
 
   (define style-btn
-    (color:Style color:text-dimmer-fg color:panel-bg color:AttrNone))
+    (color:Style (color:text-dimmer-fg) (color:panel-bg) color:AttrNone))
 
   (define style-btn-focus
-    (color:Style color:panel-bg color:text-fg color:AttrBold))
+    (color:Style (color:panel-bg) (color:text-fg) color:AttrBold))
 
   ;;; Unicode strings
 

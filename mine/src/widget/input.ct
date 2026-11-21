@@ -24,7 +24,7 @@
    #:input-widget-insert-newline!
    #:input-widget-insert-string!
    #:input-widget-line-count
-   #:input-widget-set-hint!
+   #:input-widget-set-hint! #:input-widget-set-styles!
    #:input-widget-index-at
    #:input-widget-place-cursor! #:input-widget-drag-cursor!
    #:input-widget-selecting? #:input-widget-selected-text
@@ -41,8 +41,8 @@
     (iw-text         (Cell String))
     (iw-cursor       (Cell UFix))
     (iw-prompt       (Cell String))
-    (iw-prompt-style color:Style)
-    (iw-text-style   color:Style)
+    (iw-prompt-style (Cell color:Style))
+    (iw-text-style   (Cell color:Style))
     (iw-scroll       (Cell UFix))
     (iw-hint         (Cell String))
     ;; Where a mouse selection started, while one may be in progress.
@@ -54,8 +54,8 @@
     (InputWidget (cell:new "")
                  (cell:new 0)
                  (cell:new prompt)
-                 prompt-style
-                 text-style
+                 (cell:new prompt-style)
+                 (cell:new text-style)
                  (cell:new 0)
                  (cell:new "")
                  (cell:new None)))
@@ -85,6 +85,12 @@
   (define (input-widget-set-hint! iw hint)
     "Set the placeholder hint shown when input is empty."
     (cell:write! (.iw-hint iw) hint)
+    (values))
+
+  (declare input-widget-set-styles! (InputWidget * color:Style * color:Style -> Void))
+  (define (input-widget-set-styles! iw prompt-style text-style)
+    (cell:write! (.iw-prompt-style iw) prompt-style)
+    (cell:write! (.iw-text-style iw) text-style)
     (values))
 
   ;;; Multi-line helpers
@@ -302,8 +308,8 @@ The cursor's line follows the cursor; other long lines show their end."
     "Render the input widget. Supports multi-line text with vertical scrolling.
 Prompt is shown on the first visible line; continuation lines are indented."
     (let text   = (cell:read (.iw-text iw)))
-    (let ps     = (.iw-prompt-style iw))
-    (let ts     = (.iw-text-style iw))
+    (let ps     = (cell:read (.iw-prompt-style iw)))
+    (let ts     = (cell:read (.iw-text-style iw)))
     (let x0     = (.rect-x rect))
     (let y0     = (.rect-y rect))
     (let w      = (.rect-width rect))
@@ -317,7 +323,7 @@ Prompt is shown on the first visible line; continuation lines are indented."
     (when (== (str:length text) 0)
       (let hint = (cell:read (.iw-hint iw)))
       (when (> (str:length hint) 0)
-        (let dim-style = (color:Style color:text-dimmer-fg
+        (let dim-style = (color:Style (color:text-dimmer-fg)
                                       (.style-bg ts)
                                       color:AttrItalic))
         (render:draw-text-clipped scr rect hint y0 (+ x0 plen) dim-style)))
@@ -334,7 +340,7 @@ Prompt is shown on the first visible line; continuation lines are indented."
                        ((Some range) range)
                        ((None) (Tuple 0 0))))
     (%render-lines iw scr x0 y0 w h scroll nlines text prompt plen text-w crow cursor-line-scroll ps ts
-                   (fst selection) (snd selection) color:user-selection-style)
+                   (fst selection) (snd selection) (color:user-selection-style))
     ;; Position cursor
     (match (.iv-cursor viewport)
       ((Some (Tuple x y)) (screen:screen-set-cursor scr y x))
